@@ -10,10 +10,9 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -32,20 +31,37 @@ fun ScoreboardScreenPreview() {
 
 @Composable
 fun ScoreboardScreen(
+    viewModel: ScoreboardViewModel,
+) {
+    ScoreboardScreen(
+        team1Name = viewModel.team1Name.value,
+        team2Name = viewModel.team2Name.value,
+        leftScore = viewModel.leftScore.value,
+        rightScore = viewModel.rightScore.value,
+        onLeftClick = viewModel::onLeftClick,
+        onRightClick = viewModel::onRightClick,
+    )
+}
+
+@Composable
+fun ScoreboardScreen(
+    team1Name: String,
+    team2Name: String,
+    leftScore: Int,
+    rightScore: Int,
     onLeftClick: () -> Unit,
     onRightClick: () -> Unit,
 ) {
     val activity = LocalContext.current as Activity
     activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
 
-    val leftScore = remember { mutableStateOf(0) }
-    val rightScore = remember { mutableStateOf(0) }
-
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.padding(top = 8.dp)
     ) {
         Text(
             text = "00:00",
+            fontSize = 25.sp,
         )
         Row(
             modifier = Modifier
@@ -59,18 +75,17 @@ fun ScoreboardScreen(
                     .weight(1f)
                     .fillMaxHeight()
                     .clickable {
-                        leftScore.value += 1
                         onLeftClick.invoke()
                     }
             ) {
                 Text(
-                    text = leftScore.value.toString(),
+                    text = leftScore.toString(),
                     fontSize = 100.sp,
                     fontWeight = FontWeight.Bold
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(
-                    text = "Time 1",
+                    text = team1Name,
                 )
             }
 
@@ -82,18 +97,17 @@ fun ScoreboardScreen(
                     .weight(1f)
                     .fillMaxHeight()
                     .clickable {
-                        rightScore.value += 1
                         onRightClick.invoke()
                     }
             ) {
                 Text(
-                    text = rightScore.value.toString(),
+                    text = rightScore.toString(),
                     fontSize = 100.sp,
                     fontWeight = FontWeight.Bold
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(
-                    text = "Time 2",
+                    text = team2Name,
                 )
             }
         }
