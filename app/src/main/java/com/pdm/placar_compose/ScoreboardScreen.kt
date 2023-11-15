@@ -5,6 +5,7 @@ import android.content.pm.ActivityInfo
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -31,16 +32,19 @@ fun ScoreboardScreenPreview() {
 
 @Composable
 fun ScoreboardScreen(
+    paddingValues: PaddingValues,
     viewModel: ScoreboardViewModel,
 ) {
-    ScoreboardScreen(
-        team1Name = viewModel.team1Name.value,
-        team2Name = viewModel.team2Name.value,
-        leftScore = viewModel.leftScore.value,
-        rightScore = viewModel.rightScore.value,
-        onLeftClick = viewModel::onLeftClick,
-        onRightClick = viewModel::onRightClick,
-    )
+    Column(modifier = Modifier.padding(paddingValues)) {
+        ScoreboardScreen(
+            team1Name = viewModel.team1Name.value,
+            team2Name = viewModel.team2Name.value,
+            leftScore = viewModel.leftScore.value,
+            rightScore = viewModel.rightScore.value,
+            onLeftClick = viewModel::onLeftClick,
+            onRightClick = viewModel::onRightClick,
+        )
+    }
 }
 
 @Composable
