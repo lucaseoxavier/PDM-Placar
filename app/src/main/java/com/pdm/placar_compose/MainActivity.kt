@@ -5,6 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.List
@@ -21,22 +22,25 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.pdm.placar_compose.composables.HistoryScreen
 import com.pdm.placar_compose.composables.ScoreboardScreen
+import com.pdm.placar_compose.composables.SettingsScreen
 import com.pdm.placar_compose.viewmodels.HistoryViewModel
 import com.pdm.placar_compose.viewmodels.ScoreboardViewModel
+import com.pdm.placar_compose.viewmodels.SettingsViewModel
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setContent {
-
             val scoreboardViewModel: ScoreboardViewModel by viewModels()
             val historyViewModel: HistoryViewModel by viewModels()
+            val settingsViewModel: SettingsViewModel by viewModels()
 
-            App(scoreboardViewModel, historyViewModel)
+            App(scoreboardViewModel, historyViewModel, settingsViewModel)
         }
     }
 
@@ -50,8 +54,10 @@ class MainActivity : ComponentActivity() {
 fun App(
     scoreboardViewModel: ScoreboardViewModel,
     historyViewModel: HistoryViewModel,
+    settingsViewModel: SettingsViewModel,
 ) {
     val navController = rememberNavController()
+    val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
 
     Scaffold(
         bottomBar = {
@@ -66,26 +72,38 @@ fun App(
                             contentDescription = "Navigate to History screen",
                         )
                     }
-                    IconButton(onClick = { navController.navigate(ScoreboardRoute.Configuration.name) }) {
+                    IconButton(onClick = { navController.navigate(ScoreboardRoute.Settings.name) }) {
                         Icon(
                             Icons.Filled.Settings,
-                            contentDescription = "Navigate to Configuration screen",
+                            contentDescription = "Navigate to Settings screen",
                         )
                     }
-                    IconButton(onClick = { scoreboardViewModel.saveGameResult() }) {
-                        Icon(
-                            Icons.Filled.Done,
-                            contentDescription = "Save current game",
-                        )
+                    if (currentRoute == ScoreboardRoute.Scoreboard.name) {
+                        IconButton(onClick = { scoreboardViewModel.saveGameResult() }) {
+                            Icon(
+                                Icons.Filled.Done,
+                                contentDescription = "Save current game",
+                            )
+                        }
+                    }
+                    if (currentRoute == ScoreboardRoute.History.name) {
+                        IconButton(onClick = { }) {
+                            Icon(
+                                Icons.Filled.Delete,
+                                contentDescription = "Delete previous games",
+                            )
+                        }
                     }
                 },
                 floatingActionButton = {
-                    FloatingActionButton(
-                        onClick = { scoreboardViewModel.undoLastScore() },
-                        containerColor = BottomAppBarDefaults.bottomAppBarFabColor,
-                        elevation = FloatingActionButtonDefaults.bottomAppBarFabElevation()
-                    ) {
-                        Icon(Icons.Filled.Refresh, "Undo last point")
+                    if (currentRoute == ScoreboardRoute.Scoreboard.name) {
+                        FloatingActionButton(
+                            onClick = { scoreboardViewModel.undoLastScore() },
+                            containerColor = BottomAppBarDefaults.bottomAppBarFabColor,
+                            elevation = FloatingActionButtonDefaults.bottomAppBarFabElevation()
+                        ) {
+                            Icon(Icons.Filled.Refresh, "Undo last point")
+                        }
                     }
                 }
             )
@@ -104,10 +122,14 @@ fun App(
             composable(ScoreboardRoute.History.name) {
                 HistoryScreen(
                     paddingValues = paddingValues,
-                    viewModel = historyViewModel
+                    viewModel = historyViewModel,
                 )
             }
-            composable(ScoreboardRoute.Configuration.name) {
+            composable(ScoreboardRoute.Settings.name) {
+                SettingsScreen(
+                    paddingValues = paddingValues,
+                    viewModel = settingsViewModel,
+                )
             }
         }
     }
@@ -116,5 +138,5 @@ fun App(
 enum class ScoreboardRoute {
     Scoreboard,
     History,
-    Configuration
+    Settings
 }
