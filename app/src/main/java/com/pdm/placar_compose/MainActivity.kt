@@ -5,6 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Refresh
@@ -21,6 +22,10 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.pdm.placar_compose.composables.HistoryScreen
+import com.pdm.placar_compose.composables.ScoreboardScreen
+import com.pdm.placar_compose.viewmodels.HistoryViewModel
+import com.pdm.placar_compose.viewmodels.ScoreboardViewModel
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -29,8 +34,14 @@ class MainActivity : ComponentActivity() {
         setContent {
 
             val scoreboardViewModel: ScoreboardViewModel by viewModels()
-            App(scoreboardViewModel)
+            val historyViewModel: HistoryViewModel by viewModels()
+
+            App(scoreboardViewModel, historyViewModel)
         }
+    }
+
+    companion object {
+        const val SHARED_PREFERENCES = "sharedPreferences"
     }
 }
 
@@ -38,7 +49,8 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun App(
     scoreboardViewModel: ScoreboardViewModel,
-    ) {
+    historyViewModel: HistoryViewModel,
+) {
     val navController = rememberNavController()
 
     Scaffold(
@@ -60,10 +72,16 @@ fun App(
                             contentDescription = "Navigate to Configuration screen",
                         )
                     }
+                    IconButton(onClick = { scoreboardViewModel.saveGameResult() }) {
+                        Icon(
+                            Icons.Filled.Done,
+                            contentDescription = "Save current game",
+                        )
+                    }
                 },
                 floatingActionButton = {
                     FloatingActionButton(
-                        onClick = { /* do something */ },
+                        onClick = { scoreboardViewModel.undoLastScore() },
                         containerColor = BottomAppBarDefaults.bottomAppBarFabColor,
                         elevation = FloatingActionButtonDefaults.bottomAppBarFabElevation()
                     ) {
@@ -84,6 +102,10 @@ fun App(
                 )
             }
             composable(ScoreboardRoute.History.name) {
+                HistoryScreen(
+                    paddingValues = paddingValues,
+                    viewModel = historyViewModel
+                )
             }
             composable(ScoreboardRoute.Configuration.name) {
             }

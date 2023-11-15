@@ -1,4 +1,4 @@
-package com.pdm.placar_compose
+package com.pdm.placar_compose.composables
 
 import android.app.Activity
 import android.content.pm.ActivityInfo
@@ -21,12 +21,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.pdm.placar_compose.ui.theme.PlacarComposeTheme
+import com.pdm.placar_compose.viewmodels.ScoreboardViewModel
+import com.pdm.placar_compose.Team
+import com.pdm.placar_compose.ui.theme.ScoreboardTheme
 
 @Preview
 @Composable
 fun ScoreboardScreenPreview() {
-    PlacarComposeTheme {
+    ScoreboardTheme {
     }
 }
 
@@ -37,10 +39,8 @@ fun ScoreboardScreen(
 ) {
     Column(modifier = Modifier.padding(paddingValues)) {
         ScoreboardScreen(
-            team1Name = viewModel.team1Name.value,
-            team2Name = viewModel.team2Name.value,
-            leftScore = viewModel.leftScore.value,
-            rightScore = viewModel.rightScore.value,
+            team1 = viewModel.team1.value,
+            team2 = viewModel.team2.value,
             onLeftClick = viewModel::onLeftClick,
             onRightClick = viewModel::onRightClick,
         )
@@ -49,10 +49,8 @@ fun ScoreboardScreen(
 
 @Composable
 fun ScoreboardScreen(
-    team1Name: String,
-    team2Name: String,
-    leftScore: Int,
-    rightScore: Int,
+    team1: Team,
+    team2: Team,
     onLeftClick: () -> Unit,
     onRightClick: () -> Unit,
 ) {
@@ -83,13 +81,13 @@ fun ScoreboardScreen(
                     }
             ) {
                 Text(
-                    text = leftScore.toString(),
+                    text = team1.score.toString(),
                     fontSize = 100.sp,
                     fontWeight = FontWeight.Bold
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(
-                    text = team1Name,
+                    text = team1.name,
                 )
             }
 
@@ -105,13 +103,13 @@ fun ScoreboardScreen(
                     }
             ) {
                 Text(
-                    text = rightScore.toString(),
+                    text = team2.score.toString(),
                     fontSize = 100.sp,
                     fontWeight = FontWeight.Bold
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(
-                    text = team2Name,
+                    text = team2.name,
                 )
             }
         }
