@@ -8,6 +8,12 @@ import java.io.ByteArrayInputStream
 import java.io.ObjectInputStream
 
 class HistoryViewModel: ViewModel() {
+    private fun deserializeGameObject(serializedData: ByteArray): Game {
+        val byteArrayInputStream = ByteArrayInputStream(serializedData)
+        val objectInputStream = ObjectInputStream(byteArrayInputStream)
+        return objectInputStream.readObject() as Game
+    }
+
     fun getPreviousGames(context: Context): List<Game> {
         val sharedPreferences = context.getSharedPreferences(MainActivity.SHARED_PREFERENCES, Context.MODE_PRIVATE)
         val gameList = mutableListOf<Game>()
@@ -28,9 +34,18 @@ class HistoryViewModel: ViewModel() {
         return gameList
     }
 
-    private fun deserializeGameObject(serializedData: ByteArray): Game {
-        val byteArrayInputStream = ByteArrayInputStream(serializedData)
-        val objectInputStream = ObjectInputStream(byteArrayInputStream)
-        return objectInputStream.readObject() as Game
+    fun deletePreviousGames(context: Context) {
+        val sharedPreferences = context.getSharedPreferences(MainActivity.SHARED_PREFERENCES, Context.MODE_PRIVATE)
+        val numMatches = sharedPreferences.getInt("numberMatch", 0)
+
+        val editor = sharedPreferences.edit()
+
+        for (i in 1..numMatches) {
+            val matchKey = "match$i"
+            editor.remove(matchKey)
+        }
+
+        editor.putInt("numberMatch", 0)
+        editor.apply()
     }
 }

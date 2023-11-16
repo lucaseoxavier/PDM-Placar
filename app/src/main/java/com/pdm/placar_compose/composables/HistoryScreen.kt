@@ -17,6 +17,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -48,11 +50,14 @@ fun HistoryScreen(
 ) {
     val activity = LocalContext.current as Activity
     activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
+    val context = LocalContext.current
 
-    val games: List<Game> = viewModel.getPreviousGames(LocalContext.current)
+    val games = remember { mutableStateOf(viewModel.getPreviousGames(context)) }
 
-    LazyColumn(modifier = Modifier.fillMaxWidth().padding(paddingValues)) {
-        items(games) {game ->
+    LazyColumn(modifier = Modifier
+        .fillMaxWidth()
+        .padding(paddingValues)) {
+        items(games.value) {game ->
             GameItem(game)
         }
     }

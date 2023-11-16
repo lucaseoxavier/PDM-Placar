@@ -1,5 +1,6 @@
 package com.pdm.placar_compose
 
+import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -19,7 +20,12 @@ import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -27,6 +33,7 @@ import androidx.navigation.compose.rememberNavController
 import com.pdm.placar_compose.composables.HistoryScreen
 import com.pdm.placar_compose.composables.ScoreboardScreen
 import com.pdm.placar_compose.composables.SettingsScreen
+import com.pdm.placar_compose.ui.theme.ScoreboardTheme
 import com.pdm.placar_compose.viewmodels.HistoryViewModel
 import com.pdm.placar_compose.viewmodels.ScoreboardViewModel
 import com.pdm.placar_compose.viewmodels.SettingsViewModel
@@ -40,7 +47,9 @@ class MainActivity : ComponentActivity() {
             val historyViewModel: HistoryViewModel by viewModels()
             val settingsViewModel: SettingsViewModel by viewModels()
 
-            App(scoreboardViewModel, historyViewModel, settingsViewModel)
+            ScoreboardTheme {
+                App(scoreboardViewModel, historyViewModel, settingsViewModel, applicationContext)
+            }
         }
     }
 
@@ -55,6 +64,7 @@ fun App(
     scoreboardViewModel: ScoreboardViewModel,
     historyViewModel: HistoryViewModel,
     settingsViewModel: SettingsViewModel,
+    context: Context,
 ) {
     val navController = rememberNavController()
     val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
@@ -87,7 +97,7 @@ fun App(
                         }
                     }
                     if (currentRoute == ScoreboardRoute.History.name) {
-                        IconButton(onClick = { }) {
+                        IconButton(onClick = { historyViewModel.deletePreviousGames(context) }) {
                             Icon(
                                 Icons.Filled.Delete,
                                 contentDescription = "Delete previous games",
@@ -129,6 +139,7 @@ fun App(
                 SettingsScreen(
                     paddingValues = paddingValues,
                     viewModel = settingsViewModel,
+                    navController = navController,
                 )
             }
         }

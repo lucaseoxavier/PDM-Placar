@@ -17,6 +17,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -26,6 +27,8 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import com.pdm.placar_compose.ScoreboardRoute
 import com.pdm.placar_compose.ui.theme.ScoreboardTheme
 import com.pdm.placar_compose.viewmodels.SettingsViewModel
 
@@ -50,8 +53,14 @@ fun SettingsScreenPreview() {
 @Composable
 fun SettingsScreen(
     paddingValues: PaddingValues,
-    viewModel: SettingsViewModel
+    viewModel: SettingsViewModel,
+    navController: NavController,
 ) {
+    DisposableEffect(Unit) {
+        viewModel.loadSettings()
+        onDispose { }
+    }
+
     Column(modifier = Modifier.padding(paddingValues)) {
         SettingsScreen(
             title = viewModel.title.value,
@@ -62,7 +71,10 @@ fun SettingsScreen(
             onTeam1NameChange = viewModel::onTeam1NameChange,
             onTeam2NameChange = viewModel::onTeam2NameChange,
             onExtraTimeChange = viewModel::onExtraTimeChange,
-            onSaveClick = viewModel::onSaveClick,
+            onSaveClick = {
+                viewModel.onSaveClick()
+                navController.navigate(ScoreboardRoute.Scoreboard.name)
+            },
         )
     }
 }
@@ -91,7 +103,6 @@ fun SettingsScreen(
             .verticalScroll(rememberScrollState())
             .padding(16.dp),
     ) {
-        Text(text = "Configurações", fontSize = 24.sp, fontWeight = FontWeight.Bold)
         OutlinedTextField(
             label = { Text(text = "Título") },
             value = title,
